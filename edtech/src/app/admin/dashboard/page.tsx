@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { Users, BookOpen, UserPlus, CreditCard, BarChart3, ChevronRight } from "lucide-react";
+import { Users, BookOpen, UserPlus, BarChart3, ChevronRight, Settings, SlidersHorizontal } from "lucide-react";
 import { DashboardSkeleton } from "@/components/ui";
 
 export default function AdminDashboard() {
@@ -19,43 +19,53 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8 animate-fade-in-up">
       <div>
-        <h1 className="font-heading text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-navy-600 mt-1">Platform overview and management</p>
+        <h1 className="font-heading text-4xl font-bold text-brand-navy">Administrator Panel</h1>
+        <p className="text-text-secondary mt-1">Platform overview, user management, and content authoring</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Primary Metrics Bento */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { icon: Users, label: "Total Users", value: users.length, color: "bg-blue-50 text-blue-600", href: "/admin/users" },
-          { icon: BookOpen, label: "Chapters", value: chapters.length, color: "bg-green-50 text-green-600", href: "/admin/chapters" },
-          { icon: UserPlus, label: "Mentors", value: mentors.length, color: "bg-purple-50 text-purple-600", href: "/admin/mentors" },
-          { icon: BarChart3, label: "Students", value: students.length, color: "bg-amber-50 text-amber-600", href: "/admin/users?role=student" },
+          { icon: BookOpen, label: "Chapters Live", value: chapters.length, color: "bg-brand-muted text-brand-navy", href: "/admin/chapters" },
+          { icon: UserPlus, label: "Active Mentors", value: mentors.length, color: "bg-brand-yellow/20 text-brand-yellow", bgClass: "bg-brand-navy text-white" },
+          { icon: BarChart3, label: "Enrolled Students", value: students.length, color: "bg-green-50 text-green-600", href: "/admin/users?role=student" },
         ].map((stat) => (
-          <Link key={stat.label} href={stat.href} className="card group">
-            <div className={`w-10 h-10 ${stat.color} rounded-xl flex items-center justify-center mb-3`}>
-              <stat.icon className="w-5 h-5" />
+          <Link key={stat.label} href={stat.href || "#"} className={`bento-card flex flex-col justify-between group cursor-pointer ${stat.bgClass || "bg-brand-surface"}`}>
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-8 transition-transform group-hover:scale-110 ${stat.color}`}>
+              <stat.icon className="w-6 h-6" />
             </div>
-            <p className="text-2xl font-bold">{stat.value}</p>
-            <p className="text-xs text-navy-600">{stat.label}</p>
+            <div>
+              <p className={`font-heading text-5xl font-bold mb-2 ${stat.bgClass ? "text-white" : "text-brand-navy"}`}>{stat.value}</p>
+              <p className={`text-xs uppercase tracking-wider font-bold ${stat.bgClass ? "text-white/70" : "text-text-secondary"}`}>{stat.label}</p>
+            </div>
           </Link>
         ))}
       </div>
 
-      {/* Quick actions */}
-      <div>
-        <h2 className="font-heading text-xl font-bold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {/* Control Center Bento */}
+      <div className="bento-card">
+        <div className="flex items-center gap-3 mb-8 pb-6 border-b border-brand-muted">
+          <SlidersHorizontal className="w-6 h-6 text-brand-navy" />
+          <h2 className="font-heading text-2xl font-bold text-brand-navy">Control Center</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { label: "Manage Chapters", desc: "Add, edit, or archive chapters", href: "/admin/chapters" },
-            { label: "Manage Users", desc: "View and manage user accounts", href: "/admin/users" },
-            { label: "Assign Mentors", desc: "Pair mentors with students", href: "/admin/mentors" },
-            { label: "Manage Subscriptions", desc: "Add or update subscription plans", href: "/admin/subscriptions" },
+            { label: "Content Editor", desc: "Author deep-dive chapters using the 6-step flow", href: "/admin/chapters", icon: BookOpen },
+            { label: "Directory", desc: "View and manage all user accounts & roles", href: "/admin/users", icon: Users },
+            { label: "Mentor Assignments", desc: "Pair students with industry mentors", href: "/admin/mentors", icon: UserPlus },
+            { label: "Billing & Access", desc: "Manage Pro subscriptions and billing limits", href: "/admin/subscriptions", icon: Settings },
           ].map((action) => (
-            <Link key={action.label} href={action.href} className="card-flat flex items-center justify-between group hover:bg-cream-50">
-              <div>
-                <p className="font-semibold text-sm">{action.label}</p>
-                <p className="text-xs text-navy-600">{action.desc}</p>
+            <Link key={action.label} href={action.href} className="dashboard-card flex items-center gap-5 group hover:border-brand-navy transition-all">
+              <div className="w-14 h-14 rounded-full bg-brand-muted flex items-center justify-center text-brand-navy group-hover:bg-brand-yellow group-hover:scale-110 transition-all shrink-0">
+                <action.icon className="w-6 h-6" />
               </div>
-              <ChevronRight className="w-5 h-5 text-navy-400 group-hover:text-primary-500 transition-colors" />
+              <div className="flex-1">
+                <p className="font-heading text-xl font-bold text-brand-navy mb-1">{action.label}</p>
+                <p className="text-sm text-text-secondary pr-4">{action.desc}</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-text-tertiary group-hover:text-brand-navy shrink-0" />
             </Link>
           ))}
         </div>

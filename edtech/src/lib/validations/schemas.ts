@@ -70,7 +70,7 @@ export async function validateBody<T>(req: Request, schema: z.ZodSchema<T>) {
       return {
         data: null,
         error: Response.json(
-          { error: "Validation failed", details: err.errors },
+          { error: "Validation failed", details: (err as any).errors },
           { status: 422 }
         ),
       };

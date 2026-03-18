@@ -1,46 +1,36 @@
 @import "tailwindcss";
 
 /* ==========================================
-   MÖNAC EdTech Design System
-   Inspired by Dribbble MÖNAC Landing Page
+   MÖNAC Premium EdTech Design System
+   High-End Dribbble Aesthetic Overhaul
    ========================================== */
 
 @theme {
-  /* Primary: Mustard/Ochre Yellow */
-  --color-primary-50: #fdf8ef;
-  --color-primary-100: #faefd6;
-  --color-primary-200: #f5dba8;
-  --color-primary-300: #efc475;
-  --color-primary-400: #e5b05d;
-  --color-primary-500: #d9952e;
-  --color-primary-600: #c07a23;
-  --color-primary-700: #a05e1f;
-  --color-primary-800: #834b20;
-  --color-primary-900: #6c3e1d;
-
-  /* Cream/Warm Background */
-  --color-cream-50: #fefcf9;
-  --color-cream-100: #f9f5f1;
-  --color-cream-200: #f3ece3;
-  --color-cream-300: #ebe0d0;
-
-  /* Deep navy/black for text */
-  --color-navy-900: #111111;
-  --color-navy-800: #1a1a2e;
-  --color-navy-700: #2d2d44;
-  --color-navy-600: #434360;
-
-  /* Success/Error/Info */
-  --color-success-500: #22c55e;
-  --color-error-500: #ef4444;
-  --color-info-500: #3b82f6;
+  /* High-Contrast Core Colors */
+  --color-brand-yellow: #f2a900;
+  --color-brand-mustard: #eebb4d;
+  --color-brand-navy: #0f152a;
+  --color-brand-dark: #0a0e1c;
+  --color-brand-cream: #faf8f5;
+  --color-brand-surface: #ffffff;
+  --color-brand-muted: #f2efe9;
+  
+  --color-text-primary: #0f152a;
+  --color-text-secondary: #4b5563;
+  --color-text-tertiary: #9ca3af;
 
   /* Fonts */
   --font-heading: "Playfair Display", Georgia, serif;
   --font-body: "Inter", system-ui, sans-serif;
+
+  /* Shadows for Bento Boxes & Floating Elements */
+  --shadow-bento: 0 10px 40px -10px rgba(15, 21, 42, 0.08);
+  --shadow-bento-hover: 0 20px 40px -10px rgba(15, 21, 42, 0.15);
+  --shadow-float: 0 20px 50px -20px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 40px rgba(242, 169, 0, 0.3);
 }
 
-/* Base resets */
+/* Base Configuration */
 * {
   margin: 0;
   padding: 0;
@@ -49,28 +39,33 @@
 
 html {
   scroll-behavior: smooth;
+  font-family: var(--font-body);
 }
 
 body {
-  font-family: var(--font-body);
-  background-color: var(--color-cream-50);
-  color: var(--color-navy-900);
+  background-color: var(--color-brand-cream);
+  color: var(--color-text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Heading font class */
+/* Typography Classes */
 .font-heading {
   font-family: var(--font-heading);
 }
 
-/* Pill-shaped button */
-.btn-pill {
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Premium Buttons */
+.btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 2rem;
+  padding: 0.875rem 2rem;
   border-radius: 9999px;
   font-weight: 600;
   font-size: 0.95rem;
@@ -80,77 +75,119 @@ body {
   text-decoration: none;
 }
 
-.btn-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.btn-pill:active {
-  transform: translateY(0);
+.btn:active {
+  transform: scale(0.98);
 }
 
 .btn-primary {
-  background-color: var(--color-navy-900);
+  background-color: var(--color-brand-navy);
   color: #ffffff;
 }
 
 .btn-primary:hover {
-  background-color: var(--color-navy-800);
+  background-color: var(--color-brand-dark);
+  box-shadow: var(--shadow-float);
+  transform: translateY(-2px);
 }
 
-.btn-secondary {
-  background-color: var(--color-primary-400);
-  color: var(--color-navy-900);
+.btn-accent {
+  background-color: var(--color-brand-yellow);
+  color: var(--color-brand-navy);
 }
 
-.btn-secondary:hover {
-  background-color: var(--color-primary-500);
+.btn-accent:hover {
+  background-color: #df9a00;
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
 }
 
 .btn-outline {
   background: transparent;
-  border: 2px solid var(--color-navy-900);
-  color: var(--color-navy-900);
+  border: 1.5px solid var(--color-brand-navy);
+  color: var(--color-brand-navy);
 }
 
 .btn-outline:hover {
-  background-color: var(--color-navy-900);
+  background-color: var(--color-brand-navy);
   color: #ffffff;
 }
 
-/* Card styles */
-.card {
-  background: #ffffff;
-  border-radius: 1.25rem;
+/* Bento Box & Cards */
+.bento-card {
+  background: var(--color-brand-surface);
+  border-radius: 2rem;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-bento);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(15, 21, 42, 0.03);
+}
+
+.bento-card:hover {
+  box-shadow: var(--shadow-bento-hover);
+  transform: translateY(-4px);
+}
+
+.dashboard-card {
+  background: var(--color-brand-surface);
+  border-radius: 1.5rem;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  border: 1px solid rgba(15, 21, 42, 0.05);
 }
 
-.card:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
-.card-flat {
-  background: #ffffff;
-  border-radius: 1.25rem;
-  padding: 1.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+/* Badges */
+.badge-premium {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-/* Skeleton loading */
+.badge-yellow { background-color: var(--color-brand-yellow); color: var(--color-brand-navy); }
+.badge-navy { background-color: var(--color-brand-navy); color: #fff; }
+.badge-soft { background-color: var(--color-brand-muted); color: var(--color-text-primary); }
+
+/* Custom Inputs */
+.input-premium {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: 1.5px solid var(--color-brand-muted);
+  background-color: var(--color-brand-surface);
+  color: var(--color-brand-navy);
+  transition: all 0.2s;
+}
+
+.input-premium:focus {
+  outline: none;
+  border-color: var(--color-brand-navy);
+  box-shadow: 0 0 0 4px rgba(15, 21, 42, 0.05);
+}
+
+/* Layout Utilities */
+.section-padding {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+/* Skeletons */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--color-cream-100) 25%,
-    var(--color-cream-200) 50%,
-    var(--color-cream-100) 75%
-  );
+  background: linear-gradient(90deg, #f2efe9 25%, #faf8f5 50%, #f2efe9 75%);
   background-size: 200% 100%;
   animation: skeleton-pulse 1.5s ease-in-out infinite;
-  border-radius: 0.75rem;
+  border-radius: 1rem;
 }
 
 @keyframes skeleton-pulse {
@@ -158,145 +195,31 @@ body {
   100% { background-position: -200% 0; }
 }
 
-/* Badge styles */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.025em;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-brand-cream); }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 
-.badge-success {
-  background-color: #dcfce7;
-  color: #166534;
-}
-
-.badge-warning {
-  background-color: #fef3c7;
-  color: #92400e;
-}
-
-.badge-error {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-.badge-info {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-
-/* Smooth page transitions */
-.page-enter {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.page-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-cream-100);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-cream-300);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary-300);
-}
-
-/* Focus ring */
-*:focus-visible {
-  outline: 2px solid var(--color-primary-400);
-  outline-offset: 2px;
-}
-
-/* Micro-animations */
+/* Micro Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  50% { transform: translateY(-12px); }
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: float 4s ease-in-out infinite;
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease forwards;
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-scale-in {
-  animation: scaleIn 0.5s ease forwards;
+.animate-fade-up {
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-slide-in-right {
-  animation: slideInRight 0.5s ease forwards;
-}
-
-/* Stagger children animation */
-.stagger-children > * {
-  opacity: 0;
-  animation: fadeInUp 0.5s ease forwards;
-}
-
-.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }

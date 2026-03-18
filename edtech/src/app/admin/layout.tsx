@@ -2,9 +2,9 @@ import Sidebar from "@/components/shared/Sidebar";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-cream-50">
+    <div className="min-h-screen bg-brand-cream">
       <Sidebar role="admin" />
-      <main className="ml-[260px] p-8 max-w-[1400px]">
+      <main className="ml-[260px] p-8 max-w-[1400px] animate-fade-up">
         {children}
       </main>
     </div>
