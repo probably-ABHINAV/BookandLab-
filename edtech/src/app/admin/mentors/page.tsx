@@ -11,20 +11,20 @@ export default function AdminMentorsPage() {
   const [selectedStudent, setSelectedStudent] = useState("");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-mentors"],
-    queryFn: () => fetch("/api/admin/assign-mentor").then((r) => r.json()),
+    queryKey: ["admin-assignments"],
+    queryFn: () => fetch("/api/admin/assignments").then((r) => r.json()),
     staleTime: 30_000,
   });
 
   const assignMentor = useMutation({
     mutationFn: () =>
-      fetch("/api/admin/assign-mentor", {
+      fetch("/api/admin/assignments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mentor_id: selectedMentor, student_id: selectedStudent }),
       }).then((r) => r.json()),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-mentors"] });
+      qc.invalidateQueries({ queryKey: ["admin-assignments"] });
       setSelectedMentor("");
       setSelectedStudent("");
     },

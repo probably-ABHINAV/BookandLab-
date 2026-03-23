@@ -1,152 +1,110 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
-import {
-  BookOpen,
-  TrendingUp,
-  Flame,
-  Target,
-  ChevronRight,
-} from "lucide-react";
-import {
-  StreakBadge,
-  SkillBar,
-  ProgressBar,
-  ActivityHeatmap,
-  DashboardSkeleton,
-} from "@/components/ui";
+import { BookOpen, Trophy, Star, Shield, ArrowRight } from "lucide-react";
 
 export default function ProgressPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["student-progress"],
     queryFn: () => fetch("/api/student/progress").then((r) => r.json()),
-    staleTime: 30_000,
   });
 
-  if (isLoading) return <DashboardSkeleton />;
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-6 animate-pulse">
+        <div className="h-[200px] bg-[var(--br)] rounded-2xl"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="h-[250px] bg-[var(--br)] rounded-2xl"></div>
+          <div className="h-[250px] bg-[var(--br)] rounded-2xl"></div>
+          <div className="h-[250px] bg-[var(--br)] rounded-2xl"></div>
+        </div>
+      </div>
+    );
+  }
+
+  const subjects = data?.subject_breakdown || [];
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
+    <div className="space-y-12 max-w-6xl mx-auto animate-fade-in pb-12">
+      
+      {/* 1. Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-black text-4xl text-[var(--dark)] tracking-tight">Your Learning Progress</h1>
+          <p className="text-[var(--dark)] font-medium text-lg mt-3 bg-[var(--y)] bg-opacity-20 inline-block px-4 py-1.5 rounded-full border border-[var(--y)]">
+            🌟 You are in the top <span className="font-black">15%</span> of students!
+          </p>
+        </div>
+      </div>
+
+      {/* 2. Main Content - Subject Grid */}
       <div>
-        <h1 className="font-heading text-3xl font-bold">Progress & Performance</h1>
-        <p className="text-navy-600 mt-1">Track your growth and achievements</p>
-      </div>
+        <h2 className="text-2xl font-black text-[var(--dark)] mb-6">Subject Breakdown</h2>
+        {subjects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {subjects.map((s: any, i: number) => {
+              const bgColors = ["bg-[var(--green-bg)] text-[var(--green)]", "bg-[var(--blue-bg)] text-[var(--blue)]", "bg-[var(--purple-bg)] text-[var(--purple)]", "bg-[var(--red-bg)] text-[var(--red)]"];
+              const iconStyle = bgColors[i % bgColors.length];
+              const pct = s.total > 0 ? (s.completed / s.total) * 100 : 0;
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card-flat text-center">
-          <BookOpen className="w-6 h-6 text-primary-500 mx-auto mb-2" />
-          <p className="text-2xl font-bold">{data?.total_completed ?? 0}</p>
-          <p className="text-xs text-navy-600">Total Completed</p>
-        </div>
-        <div className="card-flat text-center">
-          <Flame className="w-6 h-6 text-orange-500 mx-auto mb-2" />
-          <p className="text-2xl font-bold">{data?.streak?.current ?? 0}</p>
-          <p className="text-xs text-navy-600">Current / {data?.streak?.longest ?? 0} Best</p>
-        </div>
-        <div className="card-flat text-center">
-          <Target className="w-6 h-6 text-green-500 mx-auto mb-2" />
-          <p className="text-2xl font-bold">
-            {data?.weekly_goal?.done ?? 0}/{data?.weekly_goal?.target ?? 2}
-          </p>
-          <p className="text-xs text-navy-600">Weekly Goal</p>
-        </div>
-        <div className="card-flat text-center">
-          <TrendingUp className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-          <p className="text-2xl font-bold">
-            {data?.skill_averages
-              ? (
-                  Object.values(data.skill_averages).reduce(
-                    (sum: number, s: unknown) => sum + (s as { avg: number }).avg,
-                    0
-                  ) / 4
-                ).toFixed(1)
-              : "—"}
-          </p>
-          <p className="text-xs text-navy-600">Avg Skill Score</p>
-        </div>
-      </div>
-
-      {/* Skill Averages */}
-      {data?.skill_averages && (
-        <div>
-          <h2 className="font-heading text-xl font-bold mb-4">Skill Overview</h2>
-          <div className="card-flat space-y-3">
-            {Object.entries(data.skill_averages).map(([key, value]) => (
-              <SkillBar
-                key={key}
-                name={key.split("_").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
-                score={(value as { avg: number; trend: "up" | "down" | "stable" }).avg}
-                trend={(value as { avg: number; trend: "up" | "down" | "stable" }).trend}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Subject Breakdown */}
-      {(data?.subject_breakdown?.length ?? 0) > 0 && (
-        <div>
-          <h2 className="font-heading text-xl font-bold mb-4">Subject Completion</h2>
-          <div className="space-y-3">
-            {data.subject_breakdown.map(
-              (s: { id: string; name: string; total: number; completed: number; percentage: number }) => (
-                <div key={s.id} className="card-flat">
-                  <div className="flex justify-between mb-2">
-                    <span className="font-medium">{s.name}</span>
-                    <span className="text-sm text-navy-600">
-                      {s.completed} / {s.total}
-                    </span>
+              return (
+                <div key={s.id} className="bg-[var(--wh)] border border-[var(--br)] rounded-[16px] p-[24px] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all flex flex-col justify-between min-h-[220px]">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-14 h-14 rounded-[12px] flex items-center justify-center border border-[var(--br)] ${iconStyle}`}>
+                      <BookOpen className="w-6 h-6" />
+                    </div>
+                    <span className="font-black text-[var(--dark)] text-xl">{Math.round(pct)}%</span>
                   </div>
-                  <ProgressBar value={s.completed} max={s.total} showPercentage={false} />
+                  
+                  <div>
+                    <h3 className="font-black text-xl text-[var(--dark)] mb-1">{s.name}</h3>
+                    <p className="text-[var(--mu)] font-bold text-xs uppercase tracking-widest mb-6">
+                      {s.completed} / {s.total} Chapters Completed
+                    </p>
+
+                    <div className="h-[8px] bg-[var(--c2)] rounded-full overflow-hidden border border-[var(--br)]">
+                      <div 
+                        className="h-full bg-[var(--green)] rounded-full transition-all duration-1000 ease-out"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
-              )
-            )}
+              );
+            })}
+          </div>
+        ) : (
+          <div className="bg-[var(--wh)] border border-[var(--br)] rounded-[16px] p-12 text-center text-[var(--mu)] font-bold">
+            No active subjects found. Go to the dashboard to start learning!
+          </div>
+        )}
+      </div>
+
+      {/* 3. Recent Achievements Banner */}
+      <div className="bg-[var(--dark)] rounded-[20px] p-8 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[var(--y)] opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity"></div>
+        <div className="absolute -bottom-10 flex gap-4 opacity-5">
+          <Trophy className="w-32 h-32" /> <Star className="w-32 h-32" /> <Shield className="w-32 h-32" />
+        </div>
+        
+        <div className="relative z-10">
+          <h2 className="text-3xl font-black text-white mb-2">Recent Achievements</h2>
+          <p className="text-[var(--y)] font-bold text-sm tracking-widest uppercase">7 Day Streak • 5 Quizzes Passed • Rising Star</p>
+        </div>
+        
+        <div className="relative z-10 shrink-0 flex items-center gap-4">
+          <div className="bg-[#2A261A] border border-[#3A3528] rounded-[16px] p-4 flex items-center gap-4">
+             <div className="w-12 h-12 bg-[var(--y)] rounded-full flex items-center justify-center">
+               <span className="text-2xl">🔥</span>
+             </div>
+             <div>
+               <p className="text-[var(--mu2)] font-bold text-xs uppercase tracking-widest">Current Streak</p>
+               <p className="text-2xl font-black text-white">{data?.streak?.current ?? 0} Days</p>
+             </div>
           </div>
         </div>
-      )}
-
-      {/* Activity Heatmap */}
-      <div>
-        <h2 className="font-heading text-xl font-bold mb-4">Last 30 Days Activity</h2>
-        <div className="card-flat">
-          <ActivityHeatmap activityDates={data?.activity_dates ?? []} />
-          <p className="text-xs text-navy-600 mt-3">
-            Green = active, Gray = no activity
-          </p>
-        </div>
       </div>
 
-      {/* Streak Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <StreakBadge
-          streak={data?.streak?.current ?? 0}
-          longest={data?.streak?.longest ?? 0}
-          size="large"
-        />
-        <div className="card-flat">
-          <h3 className="font-heading text-lg font-bold mb-4">Chapter Timeline</h3>
-          {(data?.completed_chapters?.length ?? 0) > 0 ? (
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {data.completed_chapters.slice(0, 10).map(
-                (ch: { chapter_id: string; completed_at: string; chapters?: { title: string } }) => (
-                  <div key={ch.chapter_id} className="flex items-center justify-between py-2 border-b border-cream-100 last:border-0">
-                    <span className="text-sm font-medium truncate">
-                      {ch.chapters?.title || ch.chapter_id}
-                    </span>
-                    <span className="text-xs text-navy-600 shrink-0">
-                      {ch.completed_at ? new Date(ch.completed_at).toLocaleDateString() : ""}
-                    </span>
-                  </div>
-                )
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-navy-600">No chapters completed yet.</p>
-          )}
-        </div>
-      </div>
     </div>
   );
 }

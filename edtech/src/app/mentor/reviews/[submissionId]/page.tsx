@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Send, RotateCcw } from "lucide-react";
 import Link from "next/link";
 
@@ -11,20 +11,28 @@ const SKILL_LABELS: Record<number, string> = { 1: "Needs work", 2: "Developing",
 export default function ReviewSubmissionPage() {
   const { submissionId } = useParams();
   const router = useRouter();
-  const [scores, setScores] = useState({ concept_clarity: 0, critical_thinking: 0, application: 0, communication: 0 });
+  // Fetch submission data using BOLA-protected endpoint
+  const { data: submissionData, isLoading } = useQuery({
+    queryKey: ["review", submissionId],
+    queryFn: () => fetch(`/api/mentor/reviews/${submissionId}`).then((r) => r.json()),
+  });
+
+  const [scores, setScores] = useState({ concept: 0, critical_thinking: 0, application: 0, communication: 0 });
   const [comment, setComment] = useState("");
-  const [requestResubmit, setRequestResubmit] = useState(false);
 
   const submitReview = useMutation({
     mutationFn: () =>
-      fetch("/api/mentor/review", {
+      fetch(`/api/mentor/reviews/${submissionId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          submission_id: submissionId,
-          ...scores,
+          scores: {
+            concept: scores.concept,
+            critical_thinking: scores.critical_thinking,
+            application: scores.application,
+            communication: scores.communication
+          },
           comment,
-          is_resubmit_requested: requestResubmit,
         }),
       }).then((r) => r.json()),
     onSuccess: (data) => {
@@ -47,16 +55,36 @@ export default function ReviewSubmissionPage() {
         {/* Left: Submission */}
         <div className="card-flat">
           <h2 className="font-heading text-lg font-bold mb-4">Student Submission</h2>
-          <div className="bg-cream-50 rounded-xl p-4 text-sm text-navy-700 min-h-[200px]">
-            <p className="text-navy-600 italic">Submission content will load from the API. For demo, review the rubric on the right.</p>
-          </div>
+          {isLoading ? (
+            <div className="bg-cream-50 rounded-xl p-4 text-sm text-navy-700 min-h-[200px] animate-pulse">Loading...</div>
+          ) : (
+            <div className="space-y-4">
+              <div className="bg-[var(--bg2)] rounded-[12px] p-6 text-[var(--dark)] border border-[var(--br)]">
+                <p className="font-bold text-sm text-[var(--mu)] mb-2 uppercase tracking-widest">
+                  {submissionData?.submission?.users?.name || "Student"} • {submissionData?.submission?.chapters?.title || "Chapter"}
+                </p>
+                <div className="whitespace-pre-wrap font-medium leading-relaxed">
+                  {submissionData?.submission?.answer_text || "No text provided in this submission."}
+                </div>
+              </div>
+              
+              {submissionData?.submission?.file_url && (
+                <div className="bg-[var(--c2)] rounded-[12px] p-6 border border-[var(--br)] flex flex-col gap-3">
+                  <p className="font-bold text-sm text-[var(--dark)] uppercase tracking-widest">Uploaded File</p>
+                  <Link href={submissionData.submission.file_url} target="_blank" className="text-[var(--blue)] font-bold underline">
+                    View Attachment (Signed URL natively handled by Supabase Storage UI mapping if integrated)
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right: Rubric */}
         <div className="card-flat">
           <h2 className="font-heading text-lg font-bold mb-4">Rubric Scoring</h2>
           <div className="space-y-5">
-            {(["concept_clarity", "critical_thinking", "application", "communication"] as const).map((skill) => (
+            {(["concept", "critical_thinking", "application", "communication"] as const).map((skill) => (
               <div key={skill}>
                 <p className="text-sm font-semibold mb-2 capitalize">{skill.split("_").join(" ")}</p>
                 <div className="flex gap-2">
@@ -88,21 +116,8 @@ export default function ReviewSubmissionPage() {
                 className="w-full p-3 rounded-xl border border-cream-200 min-h-[100px] focus:ring-2 focus:ring-primary-400 focus:outline-none text-sm"
                 placeholder="Provide detailed feedback..."
               />
-              <p className="text-xs text-navy-600 mt-1">{comment.length}/2000 characters</p>
+              <p className={`text-xs mt-1 font-bold ${commentValid ? 'text-[var(--green)]' : 'text-red-500'}`}>{comment.length}/1000 characters {commentValid ? "✓" : ""}</p>
             </div>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={requestResubmit}
-                onChange={(e) => setRequestResubmit(e.target.checked)}
-                className="w-4 h-4 accent-primary-500"
-              />
-              <span className="text-sm">
-                <RotateCcw className="w-3.5 h-3.5 inline mr-1" />
-                Request resubmission
-              </span>
-            </label>
 
             <button
               onClick={() => submitReview.mutate()}

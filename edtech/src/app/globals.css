@@ -1,225 +1,131 @@
-@import "tailwindcss";
-
-/* ==========================================
-   MÖNAC Premium EdTech Design System
-   High-End Dribbble Aesthetic Overhaul
-   ========================================== */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@1,500;1,600&display=swap');
+@import 'tailwindcss';
 
 @theme {
-  /* High-Contrast Core Colors */
-  --color-brand-yellow: #f2a900;
-  --color-brand-mustard: #eebb4d;
-  --color-brand-navy: #0f152a;
-  --color-brand-dark: #0a0e1c;
-  --color-brand-cream: #faf8f5;
-  --color-brand-surface: #ffffff;
-  --color-brand-muted: #f2efe9;
+  --color-y: #F5A623;
+  --color-yd: #B8780A;
+  --color-dark: #17140D;
+  --color-d2: #2A261A;
+  --color-bg: #EEE8DA;
+  --color-bg2: #F5F0E8;
+  --color-wh: #FFFFFF;
+  --color-cream: #FAF4E8;
+  --color-mu: #7A7060;
+  --color-mu2: #B0A898;
+  --color-br: #E0D8C8;
   
-  --color-text-primary: #0f152a;
-  --color-text-secondary: #4b5563;
-  --color-text-tertiary: #9ca3af;
-
-  /* Fonts */
-  --font-heading: "Playfair Display", Georgia, serif;
-  --font-body: "Inter", system-ui, sans-serif;
-
-  /* Shadows for Bento Boxes & Floating Elements */
-  --shadow-bento: 0 10px 40px -10px rgba(15, 21, 42, 0.08);
-  --shadow-bento-hover: 0 20px 40px -10px rgba(15, 21, 42, 0.15);
-  --shadow-float: 0 20px 50px -20px rgba(0, 0, 0, 0.1);
-  --shadow-glow: 0 0 40px rgba(242, 169, 0, 0.3);
+  --font-sora: 'Sora', sans-serif;
 }
 
-/* Base Configuration */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-  font-family: var(--font-body);
+:root {
+  --y: #F5A623;
+  --yd: #B8780A;
+  --dark: #17140D;
+  --d2: #2A261A;
+  --bg: #EEE8DA;
+  --bg2: #F5F0E8;
+  --wh: #FFFFFF;
+  --cream: #FAF4E8;
+  --mu: #7A7060;
+  --mu2: #B0A898;
+  --br: #E0D8C8;
+  
+  --green: #16A34A;
+  --green-bg: #DCFCE7;
+  --red: #DC2626;
+  --red-bg: #FEE2E2;
+  --blue: #1D6FB5;
+  --blue-bg: #DBEAFE;
+  --purple: #6D28D9;
+  --purple-bg: #EDE9FE;
+  --amber: #B45309;
+  --amber-bg: #FEF3C7;
 }
 
 body {
-  background-color: var(--color-brand-cream);
-  color: var(--color-text-primary);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--dark);
 }
 
-/* Typography Classes */
-.font-heading {
-  font-family: var(--font-heading);
+body {
+  font-family: 'Sora', sans-serif;
+  background-color: #F0EBE0;
+  color: var(--dark);
 }
 
-.text-balance {
-  text-wrap: balance;
+@layer components {
+  /* Step 1: Every card */
+  .card {
+    @apply bg-white rounded-[16px] border border-[var(--br)] p-[20px] shadow-sm;
+  }
+
+  /* Step 1: Every primary button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-[var(--dark)] text-white font-semibold rounded-full px-6 py-2.5 transition-opacity hover:opacity-90;
+  }
+
+  /* Step 1: Every accent button */
+  .btn-accent {
+    @apply inline-flex items-center justify-center bg-[var(--y)] text-[var(--dark)] font-bold rounded-full px-6 py-2.5 transition-transform hover:scale-105;
+  }
+
+  /* Accent font for pills */
+  .pill-highlight {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-weight: 600;
+  }
+
+  /* Shared badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide;
+  }
 }
 
-/* Premium Buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 2rem;
-  border-radius: 9999px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
-}
-
-.btn:active {
-  transform: scale(0.98);
-}
-
-.btn-primary {
-  background-color: var(--color-brand-navy);
-  color: #ffffff;
-}
-
-.btn-primary:hover {
-  background-color: var(--color-brand-dark);
-  box-shadow: var(--shadow-float);
-  transform: translateY(-2px);
-}
-
-.btn-accent {
-  background-color: var(--color-brand-yellow);
-  color: var(--color-brand-navy);
-}
-
-.btn-accent:hover {
-  background-color: #df9a00;
-  box-shadow: var(--shadow-glow);
-  transform: translateY(-2px);
-}
-
-.btn-outline {
-  background: transparent;
-  border: 1.5px solid var(--color-brand-navy);
-  color: var(--color-brand-navy);
-}
-
-.btn-outline:hover {
-  background-color: var(--color-brand-navy);
-  color: #ffffff;
-}
-
-/* Bento Box & Cards */
-.bento-card {
-  background: var(--color-brand-surface);
-  border-radius: 2rem;
-  padding: 2.5rem;
-  box-shadow: var(--shadow-bento);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(15, 21, 42, 0.03);
-}
-
-.bento-card:hover {
-  box-shadow: var(--shadow-bento-hover);
-  transform: translateY(-4px);
-}
-
-.dashboard-card {
-  background: var(--color-brand-surface);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-  border: 1px solid rgba(15, 21, 42, 0.05);
-}
-
-/* Glassmorphism */
-.glass {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-}
-
-/* Badges */
-.badge-premium {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 1rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.badge-yellow { background-color: var(--color-brand-yellow); color: var(--color-brand-navy); }
-.badge-navy { background-color: var(--color-brand-navy); color: #fff; }
-.badge-soft { background-color: var(--color-brand-muted); color: var(--color-text-primary); }
-
-/* Custom Inputs */
-.input-premium {
-  width: 100%;
-  padding: 1rem 1.25rem;
-  border-radius: 1rem;
-  border: 1.5px solid var(--color-brand-muted);
-  background-color: var(--color-brand-surface);
-  color: var(--color-brand-navy);
-  transition: all 0.2s;
-}
-
-.input-premium:focus {
-  outline: none;
-  border-color: var(--color-brand-navy);
-  box-shadow: 0 0 0 4px rgba(15, 21, 42, 0.05);
-}
-
-/* Layout Utilities */
-.section-padding {
-  padding-top: 6rem;
-  padding-bottom: 6rem;
-}
-
-/* Skeletons */
-.skeleton {
-  background: linear-gradient(90deg, #f2efe9 25%, #faf8f5 50%, #f2efe9 75%);
-  background-size: 200% 100%;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
-  border-radius: 1rem;
-}
-
-@keyframes skeleton-pulse {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--color-brand-cream); }
-::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-
-/* Micro Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
+/* Base animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-up {
-  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
+/* ── BookandLab Landing Page Additions ── */
+
+.hero-section  { background: #F5A623; }
+.cream-section { background: #FDF8EF; }
+.dark-section  { background: #17140D; }
+.cream2-section{ background: #FAF4E8; }
+
+.oval-dark {
+  display: inline-block;
+  background: #17140D;
+  color: #FFFFFF;
+  border-radius: 9999px;
+  padding: 2px 24px 6px;
+  font-style: italic;
+  font-family: 'Lora', serif;
+  font-weight: 600;
+}
+.oval-outline {
+  display: inline-block;
+  border: 2.5px solid #F5A623;
+  border-radius: 9999px;
+  padding: 1px 20px 4px;
+  font-style: italic;
+  font-family: 'Lora', serif;
+  font-weight: 600;
+}
+.doodle {
+  position: absolute;
+  pointer-events: none;
+  color: #17140D;
+  font-weight: 700;
+  opacity: 0.32;
+}
+.feat-card:hover { transform: translateY(-3px); transition: all 0.2s; }
+.plan-card:hover { transform: translateY(-5px); box-shadow: 0 20px 60px rgba(0,0,0,.15); }
+.step-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,.08); }

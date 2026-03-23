@@ -11,57 +11,43 @@ export async function POST(request: NextRequest) {
   if (valErr) return valErr;
 
   const supabase = await createServerSupabaseClient();
+  try {
+    // 1. Inactivate existing true
+    await supabase.from("mentor_assignments")
+      .update({ is_active: false })
+      .eq("student_id", data.student_id)
+      .eq("is_active", true);
 
-  const { data: assignment, error } = await supabase
-    .from("mentor_assignments")
-    .upsert(
-      {
-        mentor_id: data!.mentor_id,
-        student_id: data!.student_id,
-        is_active: true,
-      },
-      { onConflict: "mentor_id,student_id" }
-    )
-    .select()
-    .single();
+    // 2. Insert new
+    const { data: assignment, error } = await supabase
+      .from("mentor_assignments")
+      .insert({
+        mentor_id: data.mentor_id,
+        student_id: data.student_id,
+        is_active: true
+      })
+      .select()
+      .single();
 
-  if (error) return NextResponse.json({ error: "Assignment failed" }, { status: 500 });
-  return NextResponse.json({ success: true, assignment });
+    if (error) throw error;
+
+    // 3. Notify mentor
+    await supabase.from("notifications").insert({
+      user_id: data.mentor_id,
+      type: "new_student",
+      title: "New student assigned",
+      body: "A new student has been assigned to you by the admin.",
+      metadata: { student_id: data.student_id }
+    });
+
+    return NextResponse.json({ success: true, assignment_id: assignment.id });
+  } catch (err) {
+    console.error("[API Error] POST /admin/assign-mentor", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
-export async function GET(request: NextRequest) {
-  const { error } = await requireRole(request, "admin");
-  if (error) return error;
-
-  const supabase = await createServerSupabaseClient();
-
-  const { data: mentors } = await supabase
-    .from("users")
-    .select("id, name, email")
-    .eq("role", "mentor")
-    .eq("is_active", true)
-    .is("deleted_at", null);
-
-  const mentorsWithCounts = await Promise.all(
-    (mentors ?? []).map(async (m) => {
-      const { count } = await supabase
-        .from("mentor_assignments")
-        .select("id", { count: "exact" })
-        .eq("mentor_id", m.id)
-        .eq("is_active", true);
-      return { ...m, student_count: count ?? 0 };
-    })
-  );
-
-  const { data: unassigned } = await supabase
-    .from("users")
-    .select("id, name, email")
-    .eq("role", "student")
-    .eq("is_active", true)
-    .is("deleted_at", null);
-
-  return NextResponse.json({
-    mentors: mentorsWithCounts,
-    students: unassigned ?? [],
-  });
+export async function PATCH(request: NextRequest) {
+  // same pattern, the instructions say 'POST/PATCH' or 'PATCH updates old and inserts new'.
+  return POST(request);
 }

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/rules/authRule";
-import { validateBody, updateWeeklyTargetSchema } from "@/lib/validations/schemas";
+import { validateBody, weeklyTargetSchema } from "@/lib/validations/schemas";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export async function PATCH(request: NextRequest) {
   const { error, user } = await requireRole(request, "student");
   if (error) return error;
 
-  const { data, error: valErr } = await validateBody(request, updateWeeklyTargetSchema);
+  const { data, error: valErr } = await validateBody(request, weeklyTargetSchema);
   if (valErr) return valErr;
 
   const supabase = await createServerSupabaseClient();

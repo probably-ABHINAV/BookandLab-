@@ -2,114 +2,143 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import {
-  BookOpen, LayoutDashboard, Target, Activity, CheckSquare, 
-  Users, User, FileEdit, Settings, LogOut, ChevronLeft, ChevronRight
+import { 
+  LogOut, LayoutDashboard, BookOpen, BarChart2, Bell, User, 
+  Sprout, FileText, ClipboardList, Users, TrendingUp, 
+  School, BookMarked, PenLine, GraduationCap, Link2, CreditCard, Target 
 } from "lucide-react";
+import { useStackApp, useUser } from "@stackframe/stack";
 
 interface SidebarProps {
   role: "student" | "mentor" | "admin";
 }
 
-const NAV_ITEMS = {
-  student: [
-    { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
-    { label: "My Subjects", href: "/student/subjects", icon: BookOpen },
-    { label: "Progress", href: "/student/progress", icon: Activity },
-    { label: "Skills", href: "/student/skills", icon: Target },
-    { label: "Profile", href: "/student/profile", icon: User },
-  ],
-  mentor: [
-    { label: "Overview", href: "/mentor/dashboard", icon: LayoutDashboard },
-    { label: "My Students", href: "/mentor/students", icon: Users },
-    { label: "Pending Reviews", href: "/mentor/reviews", icon: CheckSquare },
-    { label: "Settings", href: "/mentor/settings", icon: Settings },
-  ],
-  admin: [
-    { label: "Overview", href: "/admin/dashboard", icon: LayoutDashboard },
-    { label: "Chapters", href: "/admin/chapters", icon: BookOpen },
-    { label: "Users", href: "/admin/users", icon: Users },
-    { label: "Mentors", href: "/admin/mentors", icon: CheckSquare },
-    { label: "Subscriptions", href: "/admin/subscriptions", icon: FileEdit },
-  ],
-};
-
 export default function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
-  const items = NAV_ITEMS[role];
+  const app = useStackApp();
+  const user = useUser({ or: "redirect" });
+
+  const isCurrent = (path: string) => pathname.startsWith(path);
+
+  type NavItem = { section?: string; icon?: any; label?: string; href?: string; badge?: boolean | number; };
+
+  const studentNav: NavItem[] = [
+    { icon: LayoutDashboard, label: 'Dashboard', href: '/student/dashboard' },
+    { icon: BookOpen, label: 'My Chapters', href: '/student/subjects' },
+    { icon: BarChart2, label: 'Progress', href: '/student/progress' },
+    { icon: Sprout, label: 'Skills', href: '/student/skills' },
+    { icon: FileText, label: 'Submissions', href: '/student/projects', badge: 3 },
+    { icon: Bell, label: 'Notifications', href: '/student/notifications', badge: 2 },
+    { icon: User, label: 'Profile', href: '/student/profile' }
+  ];
+
+  const mentorNav: NavItem[] = [
+    { icon: LayoutDashboard, label: 'Dashboard', href: '/mentor/dashboard' },
+    { icon: ClipboardList, label: 'Pending Reviews', href: '/mentor/reviews', badge: 5 },
+    { icon: Users, label: 'My Students', href: "/mentor/students" },
+    { icon: TrendingUp, label: 'Skill Analytics', href: "/mentor/analytics" },
+    { icon: Bell, label: 'Notifications', href: '/mentor/notifications', badge: 1 },
+    { icon: User, label: 'Profile', href: '/mentor/profile' },
+  ];
+
+  const adminNav: NavItem[] = [
+    { section: 'Curriculum' },
+    { icon: School, label: 'Classes', href: '/admin/classes' },
+    { icon: BookMarked, label: 'Subjects', href: '/admin/subjects' },
+    { icon: BookOpen, label: 'Chapters', href: '/admin/chapters', badge: 4 },
+    { icon: PenLine, label: 'Content Editor', href: '/admin/editor' },
+    { section: 'People' },
+    { icon: Users, label: 'Users', href: '/admin/users' },
+    { icon: GraduationCap, label: 'Mentors', href: '/admin/mentors' },
+    { icon: Link2, label: 'Assignments', href: '/admin/mentors/assign' },
+    { section: 'System' },
+    { icon: CreditCard, label: 'Subscriptions', href: '/admin/subscriptions' },
+    { icon: Target, label: 'Skills & Rubrics', href: '/admin/skills' },
+    { icon: BarChart2, label: 'Reports', href: '/admin/reports' }
+  ];
+
+  const navItems = role === "student" ? studentNav : role === "mentor" ? mentorNav : adminNav;
 
   return (
-    <aside 
-      className={`fixed top-0 left-0 h-screen transition-all duration-300 z-40 bg-brand-navy text-white flex flex-col ${
-        collapsed ? "w-[88px]" : "w-[260px]"
-      }`}
-    >
-      {/* Brand Header */}
-      <div className={`h-20 flex items-center border-b border-white/5 ${collapsed ? "justify-center" : "px-6 gap-3"}`}>
-        <div className="w-10 h-10 rounded-xl bg-brand-yellow flex items-center justify-center shrink-0 shadow-glow">
-          <BookOpen className="w-5 h-5 text-brand-navy" />
-        </div>
-        {!collapsed && (
-          <span className="font-heading text-xl font-bold tracking-widest uppercase text-white animate-fade-in-up">
-            MÖNAC
-          </span>
-        )}
+    <aside style={{ width: "224px", background: "var(--dark)" }} className="fixed left-0 top-0 h-screen flex flex-col z-50 overflow-y-auto hidden md:flex border-r border-[#2A261A]">
+      {/* 1. Logo section */}
+      <div style={{ padding: "20px 18px" }} className="border-b border-[#2A261A]">
+        <Link href={`/${role}/dashboard`} className="flex items-center gap-3 group">
+          <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--y)", color: "var(--dark)" }} className="flex items-center justify-center font-bold text-lg group-hover:scale-105 transition-transform">
+            B
+          </div>
+          <div>
+            <h1 style={{ fontSize: "13px", fontWeight: 900 }} className="text-white tracking-tight">BookandLab</h1>
+            <p style={{ fontSize: "9px" }} className="text-[var(--mu2)] uppercase font-bold tracking-widest leading-none mt-0.5">Learn • Apply</p>
+          </div>
+        </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 py-6 px-3 space-y-2 overflow-y-auto">
-        {!collapsed && (
-          <p className="px-3 text-xs font-semibold text-brand-yellow uppercase tracking-wider mb-4">
-            {role} Panel
-          </p>
-        )}
-        
-        {items.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+      {/* 2. User section */}
+      <div style={{ padding: "16px 18px" }} className="border-b border-[#2A261A]">
+        <div className="flex items-center gap-3">
+          <div style={{ width: "32px", height: "32px", borderRadius: "50%", backgroundColor: role === 'admin' ? '#E74C3C' : role === 'mentor' ? '#7B5CF5' : '#1A9E5C' }} className="flex items-center justify-center font-bold text-white text-sm">
+            {user?.displayName?.charAt(0).toUpperCase() || "U"}
+          </div>
+          <div className="overflow-hidden">
+            <p style={{ fontSize: "12.5px", fontWeight: 700 }} className="text-white truncate">{user?.displayName || "User"}</p>
+            <p style={{ fontSize: "10px" }} className="text-[var(--mu)] capitalize">{role}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Nav section */}
+      <nav style={{ flex: 1 }} className="py-4 px-3 flex flex-col gap-1 overflow-y-auto">
+        {navItems.map((item, idx) => {
+          if (item.section) {
+            return (
+              <p key={`section-${item.section}-${idx}`} style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--mu)" }} className="px-3 pt-4 pb-1 uppercase">
+                {item.section}
+              </p>
+            );
+          }
+
+          if (!item.href) return null;
+
+          const active = isCurrent(item.href);
+          
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all group relative ${
-                isActive 
-                  ? "bg-brand-yellow text-brand-navy shadow-md" 
-                  : "text-white/60 hover:bg-white/5 hover:text-white"
-              }`}
+              style={{
+                background: active ? "rgba(245,166,35,0.14)" : "transparent",
+                border: active ? "1px solid rgba(245,166,35,0.22)" : "1px solid transparent",
+                color: active ? "var(--y)" : "#D0C8B8",
+                fontWeight: active ? 700 : 500
+              }}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-[13px] hover:bg-white/5 hover:text-white`}
             >
-              <item.icon className={`w-5 h-5 shrink-0 ${collapsed ? "mx-auto" : ""}`} />
-              {!collapsed && <span className="font-medium text-sm">{item.label}</span>}
-              
-              {/* Tooltip for collapsed state */}
-              {collapsed && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-brand-dark text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none z-50 whitespace-nowrap transition-opacity">
-                  {item.label}
-                </div>
+              {item.icon && <item.icon style={{ width: "16px", height: "16px", color: active ? "var(--y)" : "var(--mu2)" }} />}
+              <span className="flex-1 truncate">{item.label}</span>
+              {item.badge && (
+                <span style={{ fontSize: "10px", fontWeight: 700, background: "var(--red)", color: "white", padding: "1px 6px", borderRadius: "99px" }}>
+                  {item.badge}
+                </span>
               )}
             </Link>
           );
         })}
       </nav>
 
-      {/* Bottom Profile Area */}
-      <div className="p-4 border-t border-white/5">
-        <Link
-          href="/"
-          className={`flex items-center gap-3 px-3 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-colors ${collapsed ? "justify-center" : ""}`}
+      {/* 4. Footer */}
+      <div className="p-4 border-t border-[#2A261A] mt-auto flex items-center justify-between">
+        <button
+          onClick={() => app.urls.signOut}
+          className="flex items-center gap-2 px-2 py-1.5 text-left rounded-lg text-xs font-semibold text-[var(--mu)] hover:text-white transition-colors"
         >
-          <LogOut className="w-5 h-5 shrink-0" />
-          {!collapsed && <span className="font-medium text-sm">Exit App</span>}
-        </Link>
+          <LogOut style={{ width: "14px", height: "14px" }} />
+          <span>Log out</span>
+        </button>
+        {role === "student" && (
+          <span style={{ fontSize: "9px", fontWeight: 800, background: "rgba(22,163,74,0.15)", color: "var(--green)", padding: "2px 6px", borderRadius: "4px" }}>PRO</span>
+        )}
       </div>
-
-      {/* Collapse Toggle */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-4 top-10 w-8 h-8 rounded-full bg-brand-yellow text-brand-navy flex items-center justify-center shadow-md hover:scale-110 transition-transform z-50 border-2 border-brand-cream"
-      >
-        {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-      </button>
     </aside>
   );
 }

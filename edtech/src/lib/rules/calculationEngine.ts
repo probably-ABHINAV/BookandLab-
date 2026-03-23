@@ -1,159 +1,128 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import dayjs from "dayjs";
-import isoWeek from "dayjs/plugin/isoWeek";
+import { createServerSupabaseAdmin } from "@/lib/supabase/server";
 
-dayjs.extend(isoWeek);
-
+// Progress calculation
 export async function calculateProgress(userId: string, subjectId?: string) {
-  const supabase = await createServerSupabaseClient();
-
-  let chapQuery = supabase
-    .from("chapters")
-    .select("id")
-    .eq("is_published", true)
-    .is("deleted_at", null);
-
-  if (subjectId) chapQuery = chapQuery.eq("subject_id", subjectId);
-  const { data: chapters } = await chapQuery;
-  const ids = chapters?.map((c) => c.id) ?? [];
-
-  if (ids.length === 0) return { total: 0, completed: 0, percentage: 0 };
-
-  const { data: done } = await supabase
-    .from("chapter_progress")
-    .select("chapter_id")
-    .eq("user_id", userId)
-    .eq("status", "completed")
-    .in("chapter_id", ids);
-
+  const supabase = await createServerSupabaseAdmin();
+  let q = supabase.from("chapters").select("id").eq("is_published", true);
+  if (subjectId) q = q.eq("subject_id", subjectId);
+  const { data: chapters } = await q;
+  const ids = chapters?.map(c => c.id) ?? [];
+  const { count } = await supabase.from("chapter_progress")
+    .select("id", { count: "exact" }).eq("user_id", userId)
+    .eq("status", "completed").in("chapter_id", ids);
   const total = ids.length;
-  const completed = done?.length ?? 0;
-  return {
-    total,
-    completed,
-    percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
-  };
+  const done = count ?? 0;
+  return { total, completed: done, percentage: total > 0 ? Math.round(done / total * 100) : 0 };
 }
 
+// Skill averages with trend
 export async function calculateSkillAverages(userId: string) {
-  const supabase = await createServerSupabaseClient();
-
-  const { data: submissions } = await supabase
-    .from("project_submissions")
-    .select("id")
-    .eq("user_id", userId);
-
-  const subIds = submissions?.map((r) => r.id) ?? [];
-  if (subIds.length === 0) return null;
-
+  const supabase = await createServerSupabaseAdmin();
+  // Get all submission IDs for this student
+  const { data: subs } = await supabase
+    .from("project_submissions").select("id").eq("user_id", userId);
+  const subIds = subs?.map(s => s.id) ?? [];
+  if (!subIds.length) return null;
   const { data: reviews } = await supabase
     .from("mentor_reviews")
-    .select(
-      "concept_clarity, critical_thinking, application, communication, reviewed_at"
-    )
+    .select("concept_clarity,critical_thinking,application,communication,reviewed_at")
     .in("submission_id", subIds)
-    .order("reviewed_at", { ascending: false })
-    .limit(20);
-
-  if (!reviews || reviews.length === 0) return null;
-
-  const avg = (key: "concept_clarity" | "critical_thinking" | "application" | "communication") =>
-    Math.round(
-      (reviews.reduce((s, r) => s + (Number(r[key]) || 0), 0) / reviews.length) *
-        10
-    ) / 10;
-
+    .order("reviewed_at", { ascending: false }).limit(20);
+  if (!reviews?.length) return null;
+  const avg = (key: keyof typeof reviews[0]) => Math.round(reviews.reduce((s, r) => s + (Number(r[key]) || 0), 0) / reviews.length * 10) / 10;
   const recent = reviews.slice(0, 3);
   const prev = reviews.slice(3, 6);
-  const trend = (key: "concept_clarity" | "critical_thinking" | "application" | "communication") => {
-    const r =
-      recent.reduce((s, x) => s + Number(x[key] || 0), 0) /
-      (recent.length || 1);
-    const p =
-      prev.reduce((s, x) => s + Number(x[key] || 0), 0) / (prev.length || 1);
-    return r > p ? ("up" as const) : r < p ? ("down" as const) : ("stable" as const);
+  const trend = (key: keyof typeof reviews[0]) => {
+    const r = recent.reduce((s, x) => s + (Number(x[key]) || 0), 0) / (recent.length || 1);
+    const p = prev.reduce((s, x) => s + (Number(x[key]) || 0), 0) / (prev.length || 1);
+    return r > p ? "up" : r < p ? "down" : "stable";
   };
-
   return {
-    concept_clarity: { avg: avg("concept_clarity"), trend: trend("concept_clarity") },
+    concept_clarity:   { avg: avg("concept_clarity"),   trend: trend("concept_clarity") },
     critical_thinking: { avg: avg("critical_thinking"), trend: trend("critical_thinking") },
-    application: { avg: avg("application"), trend: trend("application") },
-    communication: { avg: avg("communication"), trend: trend("communication") },
+    application:       { avg: avg("application"),       trend: trend("application") },
+    communication:     { avg: avg("communication"),     trend: trend("communication") },
   };
 }
 
-// Called every time a student completes a step
-export async function updateUserStats(userId: string) {
-  const supabase = await createServerSupabaseClient();
-  const today = dayjs().format("YYYY-MM-DD");
-  const monday = dayjs().startOf("isoWeek").format("YYYY-MM-DD");
+function getMondayOfWeek() {
+  const d = new Date();
+  const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1); 
+  return new Date(d.setDate(diff)).toISOString().split("T")[0];
+}
 
+// src/lib/calculationEngine.ts
+export async function updateUserStats(supabase: any, userId: string) {
   const { data: stats } = await supabase
-    .from("user_stats")
-    .select("*")
-    .eq("user_id", userId)
-    .single();
+    .from("user_stats").select("*").eq("user_id", userId).single();
 
-  // --- STREAK LOGIC ---
-  let currentStreak = stats?.current_streak ?? 0;
-  let longestStreak = stats?.longest_streak ?? 0;
-  const lastActive = stats?.last_active_date;
+  const today = new Date(); 
+  today.setHours(0,0,0,0);
+  const lastActive = stats?.last_active_date
+    ? new Date(stats.last_active_date) : null;
 
-  if (lastActive === today) {
-    // Already active today, no change
-  } else if (
-    lastActive === dayjs().subtract(1, "day").format("YYYY-MM-DD")
-  ) {
-    // Consecutive day — extend streak
-    currentStreak += 1;
-    longestStreak = Math.max(longestStreak, currentStreak);
-  } else {
-    // Gap — reset streak
-    currentStreak = 1;
+  let newStreak = stats?.streak_count || 0;
+  if (!lastActive) { 
+    newStreak = 1;
+  }
+  else {
+    const diffDays = Math.floor((today.getTime()-lastActive.getTime())/86400000);
+    if (diffDays === 0) { /* same day — no change */ }
+    else if (diffDays === 1) { newStreak += 1; }
+    else { newStreak = 1; } // streak broken
   }
 
-  // --- WEEKLY GOAL LOGIC ---
-  let weeklyDone = stats?.weekly_chapters_done ?? 0;
-  const weekStart = stats?.week_start_date;
-
-  if (weekStart !== monday) {
-    weeklyDone = 0;
-  }
-
+  // Weekly goal: count chapters completed this week (Mon-Sun)
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - today.getDay() + 1);
   const { count } = await supabase
     .from("chapter_progress")
     .select("id", { count: "exact" })
-    .eq("user_id", userId)
-    .eq("status", "completed")
+    .eq("user_id", userId).eq("status", "completed")
+    .gte("completed_at", monday.toISOString());
+
+  await supabase.from("user_stats").upsert({
+    user_id: userId,
+    streak_count: newStreak,
+    chapters_this_week: count || 0,
+    last_active_date: today.toISOString()
+  }, { onConflict: "user_id" });
+}
+
+export async function oldUpdateUserStats(userId: string) {
+  const supabase = await createServerSupabaseAdmin();
+  const today = new Date().toISOString().split("T")[0];
+  const yesterday = new Date(Date.now() - 864e5).toISOString().split("T")[0];
+  const monday = getMondayOfWeek();
+  const { data: stats } = await supabase
+    .from("user_stats").select("*").eq("user_id", userId).single();
+  
+  // Streak
+  let streak = stats?.current_streak ?? 0;
+  let longest = stats?.longest_streak ?? 0;
+  const last = stats?.last_active_date;
+  if (last === today) { /* no change */ }
+  else if (last === yesterday) { streak += 1; longest = Math.max(longest, streak); }
+  else { streak = 1; }
+
+  // Weekly goal
+  const { count: weeklyDone } = await supabase
+    .from("chapter_progress").select("id", { count: "exact" })
+    .eq("user_id", userId).eq("status", "completed")
     .gte("completed_at", monday + "T00:00:00Z");
-
-  weeklyDone = count ?? 0;
-
-  const { count: totalCount } = await supabase
-    .from("chapter_progress")
-    .select("id", { count: "exact" })
-    .eq("user_id", userId)
-    .eq("status", "completed");
-
-  const { count: totalSteps } = await supabase
-    .from("chapter_progress")
-    .select("steps_completed", { count: "exact" })
-    .eq("user_id", userId);
-
-  await supabase.from("user_stats").upsert(
-    {
-      user_id: userId,
-      current_streak: currentStreak,
-      longest_streak: longestStreak,
-      last_active_date: today,
-      week_start_date: monday,
-      weekly_chapters_done: weeklyDone,
-      total_chapters_completed: totalCount ?? 0,
-      total_steps_completed: totalSteps ?? 0,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" }
-  );
-
-  return { currentStreak, longestStreak, weeklyDone };
+    
+  // Total
+  const { count: totalDone } = await supabase
+    .from("chapter_progress").select("id", { count: "exact" })
+    .eq("user_id", userId).eq("status", "completed");
+    
+  await supabase.from("user_stats").upsert({
+    user_id: userId, current_streak: streak, longest_streak: longest,
+    last_active_date: today, week_start_date: monday,
+    weekly_chapters_done: weeklyDone ?? 0,
+    total_chapters_completed: totalDone ?? 0,
+    updated_at: new Date().toISOString()
+  }, { onConflict: "user_id" });
+  
+  return { streak, weeklyDone: weeklyDone ?? 0 };
 }

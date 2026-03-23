@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { StackProvider } from "@stackframe/stack";
+import { stackServerApp } from "@/lib/stackauth/config";
 
 export const metadata: Metadata = {
   title: "BookandLab — Improve Your Skills Faster",
@@ -25,7 +27,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <StackProvider app={stackServerApp}>
+          <Providers>{children}</Providers>
+        </StackProvider>
       </body>
     </html>
   );
