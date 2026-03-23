@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     const subjectsAgg: Record<string, { total: number; done: number }> = {};
     if (progressRes.data) {
       for (const p of progressRes.data) {
-        const subjId = (p.chapters as any)?.subject_id;
+        const subjId = (p.chapters as { subject_id?: string } | null)?.subject_id;
         if (!subjId) continue;
         if (!subjectsAgg[subjId]) subjectsAgg[subjId] = { total: 0, done: 0 };
         subjectsAgg[subjId].total++;

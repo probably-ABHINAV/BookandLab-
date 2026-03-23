@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { ProgressBar, SkillBar, ReviewStatusBadge, DashboardSkeleton } from "@/components/ui";
+import { SkillBar, ReviewStatusBadge, DashboardSkeleton } from "@/components/ui";
 
 export default function MentorStudentDetailPage() {
   const { studentId } = useParams();

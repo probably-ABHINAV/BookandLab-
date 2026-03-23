@@ -3,8 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { BookOpen, Lock, CheckCircle2, ChevronRight, ArrowLeft } from "lucide-react";
-import { StepProgress, ProgressBar } from "@/components/ui";
+import { Lock, CheckCircle2, ChevronRight, ArrowLeft } from "lucide-react";
+import { StepProgress } from "@/components/ui";
 
 export default function SubjectDetailPage() {
   const { subjectId } = useParams();

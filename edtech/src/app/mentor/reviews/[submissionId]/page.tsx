@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Send, RotateCcw } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 
 const SKILL_LABELS: Record<number, string> = { 1: "Needs work", 2: "Developing", 3: "Adequate", 4: "Strong", 5: "Excellent" };

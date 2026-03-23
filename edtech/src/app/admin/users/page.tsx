@@ -2,8 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Trash2, Search, Settings, Shield, User, GraduationCap, X } from "lucide-react";
-import { ConfirmModal } from "@/components/ui";
+import { Plus, Search, Settings, Shield, User, GraduationCap, X } from "lucide-react";
 
 export default function AdminUsersPage() {
   const qc = useQueryClient();
@@ -110,7 +109,7 @@ export default function AdminUsersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--br)] bg-[var(--wh)]">
-              {users.map((u: any) => {
+              {users.map((u: { id: string; name: string; email: string; role: string; subscriptions?: { status: string }[] }) => {
                 
                 // Role styling
                 let RoleIcon = User;
@@ -210,7 +209,7 @@ export default function AdminUsersPage() {
               <button onClick={() => setDeleteId(null)} className="flex-1 bg-[var(--bg2)] text-[var(--dark)] border border-[var(--br)] px-6 py-3 rounded-full font-bold hover:bg-[var(--c2)] transition-colors">
                 Cancel
               </button>
-              <button onClick={() => { deleteId && deleteUser.mutate(deleteId); }} className="flex-1 bg-[var(--red)] text-white px-6 py-3 rounded-full font-bold hover:opacity-90 transition-opacity">
+              <button onClick={() => { if (deleteId) deleteUser.mutate(deleteId); }} className="flex-1 bg-[var(--red)] text-white px-6 py-3 rounded-full font-bold hover:opacity-90 transition-opacity">
                 Deactivate
               </button>
             </div>

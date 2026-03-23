@@ -15,13 +15,13 @@ export async function GET(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const workload: any = {};
+  const workload: Record<string, { count: number; name?: string }> = {};
   for (const a of (assignments || [])) {
-    if (!workload[a.mentor_id]) workload[a.mentor_id] = { count: 0, name: (a.users as any)?.name };
+    if (!workload[a.mentor_id]) workload[a.mentor_id] = { count: 0, name: (a.users as { name?: string } | null)?.name };
     workload[a.mentor_id].count++;
   }
 
-  return NextResponse.json({ success: true, workload: Object.entries(workload).map(([mentor_id, data]: any) => ({ mentor_id, ...data })) });
+  return NextResponse.json({ success: true, workload: Object.entries(workload).map(([mentor_id, data]) => ({ mentor_id, ...data })) });
 }
 
 export async function POST(request: NextRequest) {

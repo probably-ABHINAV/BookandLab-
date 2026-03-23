@@ -98,7 +98,7 @@ function MentorDashboardContent() {
         <div className="p-0">
           {(data?.pendingReviews?.length ?? 0) > 0 ? (
             <div className="divide-y divide-[var(--br)]">
-              {data.pendingReviews.map((r: any) => {
+              {data.pendingReviews.map((r: { id: string; created_at?: string; submitted_at?: string; users?: { name?: string }; chapters?: { title?: string } }) => {
                 const daysWaiting = Math.floor((new Date().getTime() - new Date(r.created_at || r.submitted_at).getTime()) / (1000 * 3600 * 24));
                 const isUrgent = daysWaiting > 3;
 

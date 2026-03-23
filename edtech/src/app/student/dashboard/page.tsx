@@ -114,7 +114,7 @@ function StudentDashboardContent() {
               </div>
 
               {/* Render dynamic skill snapshots */}
-              {(data.skills || []).slice(0, 3).map((skill: any, i: number) => (
+              {(data.skills || []).slice(0, 3).map((skill: { skill_type: string; score: number }, i: number) => (
                 <div key={i} className="flex items-center gap-4 p-3 rounded-xl hover:bg-[var(--c2)] transition-colors border border-transparent hover:border-[var(--br)]">
                   <div className="w-10 h-10 bg-[var(--bg2)] rounded-[8px] flex items-center justify-center border border-[var(--br)]">
                     <TrendingUp className="w-4 h-4 text-[var(--dark)]" />

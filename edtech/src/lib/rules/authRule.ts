@@ -11,6 +11,7 @@ export async function requireRole(req: NextRequest, role: string) {
 }
 
 export async function authRule(request: Request) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const user = await stackServerApp.getUser({ tokenStore: request as any }).catch(()=>null);
   if (!user) return null;
   return {

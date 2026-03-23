@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, Trophy, Star, Shield, ArrowRight } from "lucide-react";
+import { BookOpen, Trophy, Star, Shield } from "lucide-react";
 
 export default function ProgressPage() {
   const { data, isLoading } = useQuery({
@@ -42,7 +42,7 @@ export default function ProgressPage() {
         <h2 className="text-2xl font-black text-[var(--dark)] mb-6">Subject Breakdown</h2>
         {subjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {subjects.map((s: any, i: number) => {
+            {subjects.map((s: { id: string; name: string; total: number; completed: number }, i: number) => {
               const bgColors = ["bg-[var(--green-bg)] text-[var(--green)]", "bg-[var(--blue-bg)] text-[var(--blue)]", "bg-[var(--purple-bg)] text-[var(--purple)]", "bg-[var(--red-bg)] text-[var(--red)]"];
               const iconStyle = bgColors[i % bgColors.length];
               const pct = s.total > 0 ? (s.completed / s.total) * 100 : 0;

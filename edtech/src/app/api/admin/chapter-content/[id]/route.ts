@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireRole } from "@/lib/rules/authRule";
 import { createServerSupabaseAdmin } from "@/lib/supabase/server";
 import { z } from "zod";
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   const { id } = await params;
   const supabase = await createServerSupabaseAdmin();
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("chapter_content")
     .select("*")
     .eq("chapter_id", id)

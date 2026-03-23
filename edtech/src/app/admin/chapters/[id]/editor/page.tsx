@@ -2,12 +2,12 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { Search, Plus, Trash2, GraduationCap, X, Settings, Link2, Copy, MoveVertical, Shield } from "lucide-react";
+import { X, Link2, MoveVertical } from "lucide-react";
 
 export default function AdminContentEditorPage({ params }: { params: { id: string } }) {
   const qc = useQueryClient();
   const [activeStep, setActiveStep] = useState(1);
-  const [formData, setFormData] = useState<any>(null);
+  const [formData, setFormData] = useState<Record<string, unknown> | null>(null);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
 
@@ -18,12 +18,13 @@ export default function AdminContentEditorPage({ params }: { params: { id: strin
 
   useEffect(() => {
     if (data?.content && !formData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData(data.content);
     }
   }, [data, formData]);
 
   const saveMutation = useMutation({
-    mutationFn: (newContent: any) =>
+    mutationFn: (newContent: Record<string, unknown>) =>
       fetch(`/api/admin/chapters/${params.id}/content`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -43,18 +44,18 @@ export default function AdminContentEditorPage({ params }: { params: { id: strin
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-chapter-content", params.id] }),
   });
 
-  // Basic auto-save debounce simulation
   useEffect(() => {
     if (!formData) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSaveStatus("unsaved");
     const t = setTimeout(() => {
       saveMutation.mutate(formData);
     }, 2000);
     return () => clearTimeout(t);
-  }, [formData]);
+  }, [formData, saveMutation]);
 
-  const updateField = (step: number, field: string, value: any) => {
-    setFormData((prev: any) => ({
+  const updateField = (step: number, field: string, value: unknown) => {
+    setFormData((prev: Record<string, unknown>) => ({
       ...prev,
       [`step${step}_${field}`]: value
     }));
@@ -243,7 +244,7 @@ export default function AdminContentEditorPage({ params }: { params: { id: strin
                   <label className="block text-sm font-bold text-[var(--dark)] mb-2">Open prompts</label>
                   
                   <div className="space-y-3">
-                    {(formData.step3_thinking || []).map((prompt: any, idx: number) => (
+                    {(formData.step3_thinking || []).map((prompt: { text?: string }, idx: number) => (
                       <div key={idx} className="flex items-start gap-3 bg-[var(--bg2)] p-3 rounded-[10px] border border-[var(--br)]">
                         <MoveVertical className="w-5 h-5 text-[var(--mu2)] shrink-0 mt-2 cursor-grab" />
                         <div className="flex-1 space-y-2">
@@ -305,7 +306,7 @@ export default function AdminContentEditorPage({ params }: { params: { id: strin
                   <div className="border-t border-[var(--br)] pt-4 mt-6">
                     <label className="block text-sm font-bold text-[var(--dark)] mb-4">Worked examples</label>
                     <div className="space-y-4">
-                      {(formData.step4_examples || []).map((ex: any, idx: number) => (
+                      {(formData.step4_examples || []).map((ex: { problem?: string; solution?: string }, idx: number) => (
                          <div key={idx} className="bg-[var(--c2)] p-4 rounded-[12px] border border-[var(--br)] relative">
                            <button 
                             onClick={() => {

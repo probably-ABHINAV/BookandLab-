@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const supabase = await createServerSupabaseClient(); // Assuming RLS allows admin via mapped functions
 
   // Fetch all data needed for report
-  const [usersRes, progressRes, subsRes, reviewsRes] = await Promise.all([
+  const [usersRes, progressRes, subsRes] = await Promise.all([
     supabase.from("users").select("id,name,email,role,created_at").eq("is_active", true),
     supabase.from("chapter_progress").select("user_id,chapter_id,status,completed_at"),
     supabase.from("subscriptions").select("user_id,plan_name,end_date,status"),

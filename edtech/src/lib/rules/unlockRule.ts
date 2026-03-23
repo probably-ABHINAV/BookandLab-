@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 // src/lib/rules/unlockRule.ts
 export async function unlockRule(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any, userId: string, chapterId: string, stepNumber: number
 ): Promise<boolean> {
   if (stepNumber === 1) return true;

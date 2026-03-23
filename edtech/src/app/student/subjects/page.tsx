@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { BookOpen, ChevronRight, Lock, CheckCircle2 } from "lucide-react";
+import { BookOpen, ChevronRight } from "lucide-react";
 import { ProgressBar } from "@/components/ui";
 
 export default function SubjectsPage() {

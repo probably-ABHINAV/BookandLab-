@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/rules/authRule";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
+interface UserRow { name?: string; email?: string; avatar_url?: string; created_at?: string }
+
 export async function GET(request: NextRequest) {
   const { error: authErr, user } = await requireRole(request, "mentor");
   if (authErr) return authErr;
@@ -21,7 +23,7 @@ export async function GET(request: NextRequest) {
     
     // 2. We'd enrich this with chapter progress and overall mentor score stats. 
     // This replicates the BOLA logic because `studentIds` limits exactly who we query.
-    let studentDetails: any[] = [];
+    let studentDetails: { id: string; name?: string; email?: string; avatar_url?: string; streak: number; completed: number }[] = [];
 
     if (studentIds.length > 0) {
       const { data: stats } = await supabase
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
         
       studentDetails = assignments!.map(a => {
         const matchingStats = stats?.find(s => s.user_id === a.student_id);
-        const u = (a.users as any);
+        const u = a.users as UserRow | UserRow[];
         return {
           id: a.student_id,
           name: Array.isArray(u) ? u[0]?.name : u?.name,

@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
 
   const formData = await request.formData();
   const file = formData.get("file") as File | null;
-  const stepContext = formData.get("stepContext") as string || "";
 
   if (!file || !file.size) return NextResponse.json({ error: "No file provided" }, { status: 400 });
 
@@ -27,7 +26,7 @@ export async function POST(request: NextRequest) {
   const adminClient = createAdminClient();
 
   const arrayBuffer = await file.arrayBuffer();
-  const { data: storageData, error: storageErr } = await adminClient.storage
+  const { error: storageErr } = await adminClient.storage
     .from(bucket)
     .upload(path, arrayBuffer, { contentType: file.type, upsert: false });
 

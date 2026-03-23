@@ -52,6 +52,7 @@ function getMondayOfWeek() {
 }
 
 // src/lib/calculationEngine.ts
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateUserStats(supabase: any, userId: string) {
   const { data: stats } = await supabase
     .from("user_stats").select("*").eq("user_id", userId).single();

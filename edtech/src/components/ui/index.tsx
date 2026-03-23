@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Circle, Flame, Target, ChevronRight } from "lucide-react";
+import { CheckCircle2, Circle, Flame, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // --- UI COMPONENTS ---
@@ -144,7 +144,7 @@ export function ActivityHeatmap({ activityDates }: { activityDates: string[] }) 
   );
 }
 
-export function ConfirmModal({ open, title, message, confirmText, onConfirm, onCancel, destructive }: any) {
+export function ConfirmModal({ open, title, message, confirmText, onConfirm, onCancel, destructive }: { open: boolean; title: string; message: string; confirmText?: string; onConfirm: () => void; onCancel: () => void; destructive?: boolean }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 bg-brand-navy/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">

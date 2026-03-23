@@ -17,7 +17,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const { id } = await params;
   const adminClient = createAdminClient();
 
-  const updates: any = { updated_at: new Date().toISOString() };
+  const updates: Record<string, string | boolean | null> = { updated_at: new Date().toISOString() };
   if (data.title !== undefined) updates.title = data.title;
   if (data.description !== undefined) updates.description = data.description;
   if (data.status !== undefined) {

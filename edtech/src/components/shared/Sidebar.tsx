@@ -23,8 +23,9 @@ export default function Sidebar({ role }: SidebarProps) {
 
   const isCurrent = (path: string) => pathname.startsWith(path);
 
-  // Close on route change
+  // Close on route change — standard Next.js pattern
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMobileOpen(false);
   }, [pathname]);
 
@@ -40,7 +41,7 @@ export default function Sidebar({ role }: SidebarProps) {
 
   const toggleMobile = useCallback(() => setMobileOpen(prev => !prev), []);
 
-  type NavItem = { section?: string; icon?: any; label?: string; href?: string; badge?: boolean | number; };
+  type NavItem = { section?: string; icon?: React.ComponentType<{ style?: React.CSSProperties }>; label?: string; href?: string; badge?: boolean | number; };
 
   const studentNav: NavItem[] = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/student/dashboard' },

@@ -63,7 +63,7 @@ export default function AdminChaptersPage() {
         <div className="p-0">
           {chapters.length > 0 ? (
             <div className="divide-y divide-[var(--br)]">
-              {chapters.map((ch: any) => (
+              {chapters.map((ch: { id: string; title: string; is_published: boolean; subjects?: { name?: string }; estimated_minutes?: number }) => (
                 <div key={ch.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-8 hover:bg-[var(--c2)] transition-colors gap-6">
                   
                   <div className="flex items-start gap-6 flex-1">
@@ -142,7 +142,7 @@ export default function AdminChaptersPage() {
               <button onClick={() => setDeleteId(null)} className="flex-1 bg-[var(--bg2)] text-[var(--dark)] border border-[var(--br)] px-6 py-3 rounded-full font-bold hover:bg-[var(--c2)] transition-colors">
                 Cancel
               </button>
-              <button onClick={() => { deleteId && deleteChapter.mutate(deleteId); }} className="flex-1 bg-[var(--red)] text-white px-6 py-3 rounded-full font-bold hover:opacity-90 transition-opacity">
+              <button onClick={() => { if (deleteId) deleteChapter.mutate(deleteId); }} className="flex-1 bg-[var(--red)] text-white px-6 py-3 rounded-full font-bold hover:opacity-90 transition-opacity">
                 Delete
               </button>
             </div>

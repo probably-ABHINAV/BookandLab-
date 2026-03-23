@@ -15,8 +15,11 @@ export default function LoginPage() {
   const handleDemoLogin = async (role: "student" | "mentor" | "admin") => {
     setLoading(true);
     // Set demo cookies
+    // eslint-disable-next-line react-hooks/immutability
     document.cookie = `user_id=demo-${role}-id; path=/; max-age=86400`;
+    // eslint-disable-next-line react-hooks/immutability
     document.cookie = `user_role=${role}; path=/; max-age=86400`;
+    // eslint-disable-next-line react-hooks/immutability
     window.location.href = `/${role}/dashboard`;
   };
 
