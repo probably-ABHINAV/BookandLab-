@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LogOut, LayoutDashboard, BookOpen, BarChart2, Bell, User, 
-  Sprout, FileText, ClipboardList, Users, TrendingUp, 
-  School, BookMarked, PenLine, GraduationCap, Link2, CreditCard, Target 
+import { useState, useEffect, useCallback } from "react";
+import {
+  LogOut, LayoutDashboard, BookOpen, BarChart2, Bell, User,
+  Sprout, FileText, ClipboardList, Users, TrendingUp,
+  School, BookMarked, PenLine, GraduationCap, Link2, CreditCard, Target,
+  Menu, X
 } from "lucide-react";
 import { useStackApp, useUser } from "@stackframe/stack";
 
@@ -17,8 +19,26 @@ export default function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
   const app = useStackApp();
   const user = useUser({ or: "redirect" });
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isCurrent = (path: string) => pathname.startsWith(path);
+
+  // Close on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
+  const toggleMobile = useCallback(() => setMobileOpen(prev => !prev), []);
 
   type NavItem = { section?: string; icon?: any; label?: string; href?: string; badge?: boolean | number; };
 
@@ -59,9 +79,11 @@ export default function Sidebar({ role }: SidebarProps) {
 
   const navItems = role === "student" ? studentNav : role === "mentor" ? mentorNav : adminNav;
 
-  return (
-    <aside style={{ width: "224px", background: "var(--dark)" }} className="fixed left-0 top-0 h-screen flex flex-col z-50 overflow-y-auto hidden md:flex border-r border-[#2A261A]">
-      {/* 1. Logo section */}
+  const roleColor = role === 'admin' ? '#E74C3C' : role === 'mentor' ? '#7B5CF5' : '#1A9E5C';
+
+  const renderNavContent = () => (
+    <>
+      {/* Logo section */}
       <div style={{ padding: "20px 18px" }} className="border-b border-[#2A261A]">
         <Link href={`/${role}/dashboard`} className="flex items-center gap-3 group">
           <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--y)", color: "var(--dark)" }} className="flex items-center justify-center font-bold text-lg group-hover:scale-105 transition-transform">
@@ -74,10 +96,10 @@ export default function Sidebar({ role }: SidebarProps) {
         </Link>
       </div>
 
-      {/* 2. User section */}
+      {/* User section */}
       <div style={{ padding: "16px 18px" }} className="border-b border-[#2A261A]">
         <div className="flex items-center gap-3">
-          <div style={{ width: "32px", height: "32px", borderRadius: "50%", backgroundColor: role === 'admin' ? '#E74C3C' : role === 'mentor' ? '#7B5CF5' : '#1A9E5C' }} className="flex items-center justify-center font-bold text-white text-sm">
+          <div style={{ width: "32px", height: "32px", borderRadius: "50%", backgroundColor: roleColor }} className="flex items-center justify-center font-bold text-white text-sm shrink-0">
             {user?.displayName?.charAt(0).toUpperCase() || "U"}
           </div>
           <div className="overflow-hidden">
@@ -87,7 +109,7 @@ export default function Sidebar({ role }: SidebarProps) {
         </div>
       </div>
 
-      {/* 3. Nav section */}
+      {/* Nav section */}
       <nav style={{ flex: 1 }} className="py-4 px-3 flex flex-col gap-1 overflow-y-auto">
         {navItems.map((item, idx) => {
           if (item.section) {
@@ -101,7 +123,7 @@ export default function Sidebar({ role }: SidebarProps) {
           if (!item.href) return null;
 
           const active = isCurrent(item.href);
-          
+
           return (
             <Link
               key={item.href}
@@ -112,7 +134,7 @@ export default function Sidebar({ role }: SidebarProps) {
                 color: active ? "var(--y)" : "#D0C8B8",
                 fontWeight: active ? 700 : 500
               }}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-[13px] hover:bg-white/5 hover:text-white`}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-[13px] hover:bg-white/5 hover:text-white min-h-[44px]"
             >
               {item.icon && <item.icon style={{ width: "16px", height: "16px", color: active ? "var(--y)" : "var(--mu2)" }} />}
               <span className="flex-1 truncate">{item.label}</span>
@@ -126,11 +148,11 @@ export default function Sidebar({ role }: SidebarProps) {
         })}
       </nav>
 
-      {/* 4. Footer */}
+      {/* Footer */}
       <div className="p-4 border-t border-[#2A261A] mt-auto flex items-center justify-between">
         <button
           onClick={() => app.urls.signOut}
-          className="flex items-center gap-2 px-2 py-1.5 text-left rounded-lg text-xs font-semibold text-[var(--mu)] hover:text-white transition-colors"
+          className="flex items-center gap-2 px-2 py-1.5 text-left rounded-lg text-xs font-semibold text-[var(--mu)] hover:text-white transition-colors min-h-[44px]"
         >
           <LogOut style={{ width: "14px", height: "14px" }} />
           <span>Log out</span>
@@ -139,6 +161,50 @@ export default function Sidebar({ role }: SidebarProps) {
           <span style={{ fontSize: "9px", fontWeight: 800, background: "rgba(22,163,74,0.15)", color: "var(--green)", padding: "2px 6px", borderRadius: "4px" }}>PRO</span>
         )}
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* ── Mobile Top Bar ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-4" style={{ background: "var(--dark)" }}>
+        <Link href={`/${role}/dashboard`} className="flex items-center gap-2.5">
+          <div style={{ width: "28px", height: "28px", borderRadius: "7px", background: "var(--y)", color: "var(--dark)" }} className="flex items-center justify-center font-bold text-sm">
+            B
+          </div>
+          <span style={{ fontSize: "13px", fontWeight: 900 }} className="text-white tracking-tight">BookandLab</span>
+        </Link>
+        <button
+          onClick={toggleMobile}
+          className="w-10 h-10 flex items-center justify-center rounded-lg text-white hover:bg-white/10 transition-colors"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+        >
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* ── Mobile Drawer Overlay ── */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* ── Mobile Drawer ── */}
+      <aside
+        className={`md:hidden fixed top-14 left-0 bottom-0 z-40 w-[260px] flex flex-col overflow-y-auto transition-transform duration-300 ease-in-out ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+        style={{ background: "var(--dark)" }}
+      >
+        {renderNavContent()}
+      </aside>
+
+      {/* ── Desktop Sidebar (unchanged) ── */}
+      <aside style={{ width: "224px", background: "var(--dark)" }} className="hidden md:flex fixed left-0 top-0 h-screen flex-col z-50 overflow-y-auto border-r border-[#2A261A]">
+        {renderNavContent()}
+      </aside>
+    </>
   );
 }

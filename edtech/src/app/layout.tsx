@@ -1,14 +1,72 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { StackProvider } from "@stackframe/stack";
 import { stackServerApp } from "@/lib/stackauth/config";
+import JsonLd from "@/components/shared/JsonLd";
+
+const SITE_URL = "https://new-bookandlab.vercel.app";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#F5A623",
+};
 
 export const metadata: Metadata = {
-  title: "BookandLab — Improve Your Skills Faster",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "BookandLab — Improve Your Skills Faster",
+    template: "%s | BookandLab",
+  },
   description:
-    "An interactive EdTech platform for students to learn through structured 6-step chapters, track progress, build streaks, and get mentor feedback.",
-  keywords: ["edtech", "learning", "education", "skills", "mentoring"],
+    "An interactive EdTech platform for Class 6–12 students to learn through structured 6-step chapters, track progress, build streaks, and get real mentor feedback.",
+  keywords: [
+    "edtech",
+    "learning",
+    "education",
+    "skills",
+    "mentoring",
+    "online learning",
+    "student platform",
+    "mentor review",
+    "Class 6 to 12",
+    "BookandLab",
+  ],
+  authors: [{ name: "BookandLab" }],
+  creator: "BookandLab",
+  publisher: "BookandLab",
+  formatDetection: { telephone: false },
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: SITE_URL,
+    siteName: "BookandLab",
+    title: "BookandLab — Improve Your Skills Faster",
+    description:
+      "Structured 6-step chapter learning with real mentor feedback. Track your skills, build streaks, and grow every week.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BookandLab — Improve Your Skills Faster",
+    description:
+      "Structured 6-step chapter learning with real mentor feedback for Class 6–12 students.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
 };
 
 export default function RootLayout({
@@ -27,6 +85,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <JsonLd />
         <StackProvider app={stackServerApp}>
           <Providers>{children}</Providers>
         </StackProvider>

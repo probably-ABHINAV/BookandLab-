@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Users, BookOpen, CreditCard, Activity, ArrowRight, Settings } from "lucide-react";
 
 export default function AdminDashboard() {
-  const usersQ = useQuery({ queryKey: ["admin-users"], queryFn: () => fetch("/api/admin/user").then(r => r.json()) });
-  const chaptersQ = useQuery({ queryKey: ["admin-chapters"], queryFn: () => fetch("/api/admin/chapter").then(r => r.json()) });
+  const usersQ = useQuery({ queryKey: ["admin-users"], queryFn: () => fetch("/api/admin/users").then(r => r.json()) });
+  const chaptersQ = useQuery({ queryKey: ["admin-chapters"], queryFn: () => fetch("/api/admin/chapters").then(r => r.json()) });
 
   if (usersQ.isLoading || chaptersQ.isLoading) {
     return (

@@ -86,11 +86,17 @@ function StudentDashboardContent() {
                </div>
              </div>
 
-             <div className="shrink-0 flex items-center">
-               <Link href={`/student/chapter/${current?.chapter_id || "demo"}`} className="bg-[var(--dark)] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:opacity-90 transition-opacity">
-                 <Play className="w-4 h-4" /> Resume Step {currentStep}
-               </Link>
-             </div>
+              <div className="shrink-0 flex items-center">
+                {current?.chapter_id ? (
+                  <Link href={`/student/chapter/${current.chapter_id}`} className="bg-[var(--dark)] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:opacity-90 transition-opacity">
+                    <Play className="w-4 h-4" /> Resume Step {currentStep}
+                  </Link>
+                ) : (
+                  <span className="bg-[var(--mu)] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 opacity-50 cursor-not-allowed">
+                    <Clock className="w-4 h-4" /> No Active Chapter
+                  </span>
+                )}
+              </div>
           </div>
 
           {/* Card: Recent Activity (Streak & Skills) */}

@@ -129,3 +129,41 @@ body {
 .feat-card:hover { transform: translateY(-3px); transition: all 0.2s; }
 .plan-card:hover { transform: translateY(-5px); box-shadow: 0 20px 60px rgba(0,0,0,.15); }
 .step-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,.08); }
+
+/* ── Mobile-First Responsive Utilities ── */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Remove iOS tap highlight */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent horizontal overflow on mobile */
+body {
+  overflow-x: hidden;
+}
+
+/* Mobile landscape orientation fix */
+@media (max-width: 767px) and (orientation: landscape) {
+  .hero-section, #hero {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+}
+
+/* Custom size utilities for emoji containers */
+.w-13 { width: 52px; }
+.h-13 { height: 52px; }
+
